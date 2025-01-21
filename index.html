@@ -101,9 +101,20 @@
                 
                 // Read Excel file
                 const arrayBuffer = await file.arrayBuffer();
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const workbook = XLSX.read(arrayBuffer, { 
+                    type: 'array',
+                    cellText: false,
+                    cellDates: true,
+                    cellNF: true
+                });
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                // Get the data with specific options
+                const excelData = XLSX.utils.sheet_to_json(worksheet, {
+                    header: 1,
+                    raw: false,  // Return formatted text
+                    defval: ''   // Default empty cells to empty string
+                });
 
                 // Remove header row if present
                 if (excelData.length > 0 && typeof excelData[0][0] === 'string') {
@@ -111,17 +122,28 @@
                 }
 
                 // Process each row
-                processedOrders = excelData.map(row => {
-                    const isbn = String(row[0]).trim().replace(/[-\s]/g, '');
-                    const quantity = row[1] || 0;
+                processedOrders = excelData.map((row, idx) => {
+                    // Ensure we have a string and format it correctly
+                    let isbn = String(row[0] || '');
                     
-                    console.log('Processing ISBN:', isbn);
-                    console.log('Current booksData length:', booksData.length);
-                    console.log('Sample booksData items:', booksData.slice(0, 2));
+                    // If it's a number in scientific notation, convert it
+                    if (isbn.includes('e')) {
+                        isbn = Number(isbn).toFixed(0);
+                    }
+                    
+                    // Remove any non-digit characters and pad to 13 digits
+                    isbn = isbn.replace(/\D/g, '').padStart(13, '0');
+                    
+                    const quantity = parseInt(row[1]) || 0;
+                    
+                    console.log(`Row ${idx + 1} - Original: ${row[0]}, Processed ISBN: ${isbn}`);
                     
                     const stockItem = booksData.find(item => {
-                        console.log(`Comparing ${item.code} with ${isbn}`);
-                        return item.code === isbn;
+                        const match = item.code === isbn;
+                        if (match) {
+                            console.log(`Match found for ISBN ${isbn}`);
+                        }
+                        return match;
                     });
                     
                     return {
