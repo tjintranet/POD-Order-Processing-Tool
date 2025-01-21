@@ -165,13 +165,14 @@
 
             processedOrders.forEach((order, index) => {
                 const tr = document.createElement('tr');
+                const orderRef = document.getElementById('orderRef').value || '';  // Get current value
                 tr.innerHTML = `
                     <td>
                         <button class="btn btn-danger btn-sm" onclick="deleteRow(${index})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
-                    <td>${order.orderRef}</td>
+                    <td>${orderRef}</td>
                     <td>${order.isbn}</td>
                     <td>${order.description}</td>
                     <td>${order.quantity}</td>
