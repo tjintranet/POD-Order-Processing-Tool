@@ -66,22 +66,21 @@
     </div>
 
     <script>
-        // Global variable to store processed data
+        // Global variables
+        let booksData = [];
         let processedOrders = [];
 
-        // Temporary mock data (replace this with actual data loading mechanism)
-        const stockData = [
-            {
-                "code": "9781234567890",
-                "description": "Sample Book 1",
-                "setupdate": "2024-01-01"
-            },
-            {
-                "code": "9780987654321",
-                "description": "Sample Book 2",
-                "setupdate": "2024-01-02"
+        // Fetch ISBN data when page loads
+        async function fetchData() {
+            try {
+                const response = await fetch('data.json');
+                booksData = await response.json();
+                console.log('Data loaded:', booksData.length, 'items');
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showStatus('Error loading book data', 'danger');
             }
-        ];
+        }
 
         // Enable file input handling
         document.getElementById('excelFile').addEventListener('change', handleFileSelect);
@@ -106,10 +105,12 @@
 
                 // Process each row
                 processedOrders = excelData.map(row => {
-                    const isbn = String(row[0]); // First column is ISBN
-                    const quantity = row[1]; // Second column is Quantity
-                    const stockItem = stockData.find(item => item.code === isbn);
-
+                    const isbn = String(row[0]).trim().replace(/[-\s]/g, '');
+                    const quantity = row[1] || 0;
+                    
+                    console.log('Processing ISBN:', isbn);
+                    const stockItem = booksData.find(item => item.code === isbn);
+                    
                     return {
                         isbn,
                         description: stockItem?.description || 'Not Found',
@@ -227,6 +228,9 @@
                 }, 3000);
             }
         }
+
+        // Initialize by fetching data
+        fetchData();
     </script>
 
     <!-- Bootstrap Bundle with Popper -->
