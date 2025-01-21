@@ -32,8 +32,14 @@
                     <div class="card-body">
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label for="excelFile" class="form-label">Upload Excel File (ISBN and Quantity columns)</label>
-                                <input type="file" class="form-control" id="excelFile" accept=".xlsx,.xls">
+                                <div class="mb-3">
+                                    <label for="orderRef" class="form-label">Order Reference</label>
+                                    <input type="text" class="form-control" id="orderRef" placeholder="Enter order reference">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="excelFile" class="form-label">Upload Excel File (ISBN and Quantity columns)</label>
+                                    <input type="file" class="form-control" id="excelFile" accept=".xlsx,.xls">
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="alert alert-info mt-md-4" id="status" style="display: none;"></div>
@@ -46,6 +52,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Action</th>
+                                        <th>Order Ref</th>
                                         <th>ISBN</th>
                                         <th>Description</th>
                                         <th>Quantity</th>
@@ -164,6 +171,7 @@
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
+                    <td>${order.orderRef}</td>
                     <td>${order.isbn}</td>
                     <td>${order.description}</td>
                     <td>${order.quantity}</td>
