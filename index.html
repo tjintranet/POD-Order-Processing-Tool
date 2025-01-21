@@ -74,11 +74,18 @@
         async function fetchData() {
             try {
                 const response = await fetch('data.json');
-                booksData = await response.json();
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const text = await response.text(); // Get the raw text first
+                console.log('Raw JSON response:', text.substring(0, 200) + '...'); // Log the start of the response
+                
+                booksData = JSON.parse(text);
                 console.log('Data loaded:', booksData.length, 'items');
+                console.log('Sample data item:', booksData[0]); // Log first item
             } catch (error) {
                 console.error('Error fetching data:', error);
-                showStatus('Error loading book data', 'danger');
+                showStatus('Error loading book data: ' + error.message, 'danger');
             }
         }
 
@@ -109,7 +116,13 @@
                     const quantity = row[1] || 0;
                     
                     console.log('Processing ISBN:', isbn);
-                    const stockItem = booksData.find(item => item.code === isbn);
+                    console.log('Current booksData length:', booksData.length);
+                    console.log('Sample booksData items:', booksData.slice(0, 2));
+                    
+                    const stockItem = booksData.find(item => {
+                        console.log(`Comparing ${item.code} with ${isbn}`);
+                        return item.code === isbn;
+                    });
                     
                     return {
                         isbn,
