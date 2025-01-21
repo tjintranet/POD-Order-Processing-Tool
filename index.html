@@ -69,6 +69,20 @@
         // Global variable to store processed data
         let processedOrders = [];
 
+        // Temporary mock data (replace this with actual data loading mechanism)
+        const stockData = [
+            {
+                "code": "9781234567890",
+                "description": "Sample Book 1",
+                "setupdate": "2024-01-01"
+            },
+            {
+                "code": "9780987654321",
+                "description": "Sample Book 2",
+                "setupdate": "2024-01-02"
+            }
+        ];
+
         // Enable file input handling
         document.getElementById('excelFile').addEventListener('change', handleFileSelect);
 
@@ -89,10 +103,6 @@
                 if (excelData.length > 0 && typeof excelData[0][0] === 'string') {
                     excelData.shift();
                 }
-
-                // Load JSON data
-                const response = await window.fs.readFile('data.json', { encoding: 'utf8' });
-                const stockData = JSON.parse(response);
 
                 // Process each row
                 processedOrders = excelData.map(row => {
