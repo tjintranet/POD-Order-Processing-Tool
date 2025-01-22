@@ -151,11 +151,57 @@ function downloadCsv() {
     }
 }
 
+async function downloadTemplate() {
+    try {
+        const response = await fetch('order_template.xlsx');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'order_template.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        showStatus('Template downloaded successfully!', 'success');
+    } catch (error) {
+        console.error('Error downloading template:', error);
+        showStatus('Error downloading template', 'danger');
+    }
+}
+
 function enableButtons(enabled) {
     document.getElementById('clearBtn').disabled = !enabled;
     document.getElementById('downloadBtn').disabled = !enabled;
     document.getElementById('deleteSelectedBtn').disabled = !enabled;
     document.getElementById('selectAll').checked = false;
+}
+
+function toggleAllCheckboxes() {
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    const selectAllCheckbox = document.getElementById('selectAll');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+}
+
+function deleteSelected() {
+    const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+    const indices = Array.from(checkboxes)
+        .map(checkbox => parseInt(checkbox.dataset.index))
+        .sort((a, b) => b - a);
+
+    indices.forEach(index => {
+        processedOrders.splice(index, 1);
+    });
+
+    updatePreviewTable();
+    showStatus(`${indices.length} rows deleted`, 'info');
+    enableButtons(processedOrders.length > 0);
 }
 
 function showStatus(message, type) {
