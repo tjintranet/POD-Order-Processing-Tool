@@ -175,6 +175,7 @@
                     const stockItem = booksMap.get(isbn);
                     
                     return {
+                        orderRef,
                         isbn,
                         description: stockItem?.description || 'Not Found',
                         quantity,
@@ -204,7 +205,6 @@
 
             processedOrders.forEach((order, index) => {
                 const tr = document.createElement('tr');
-                const orderRef = document.getElementById('orderRef').value || '';
                 tr.innerHTML = `
                     <td>
                         <input type="checkbox" class="row-checkbox" data-index="${index}">
@@ -214,7 +214,7 @@
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
-                    <td>${orderRef}</td>
+                    <td>${order.orderRef}</td>
                     <td>${order.isbn}</td>
                     <td>${order.description}</td>
                     <td>${order.quantity}</td>
@@ -251,7 +251,7 @@
             }
 
             try {
-                // Convert to CSV - format to be specified
+                // Convert to CSV
                 const csv = Papa.unparse(processedOrders);
 
                 // Create and trigger download
