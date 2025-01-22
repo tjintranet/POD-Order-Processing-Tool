@@ -162,14 +162,12 @@ function downloadPdf() {
         const doc = new jsPDF();
         const orderRef = document.getElementById('orderRef').value;
 
-        // Add header
         doc.setFontSize(16);
         doc.text('POD Order Details', 14, 20);
         doc.setFontSize(12);
         doc.text(`Order Reference: ${orderRef}`, 14, 30);
         doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 40);
 
-        // Prepare table data
         const tableData = processedOrders.map(order => [
             order.isbn,
             order.description,
@@ -177,7 +175,6 @@ function downloadPdf() {
             order.available ? 'Available' : 'Not Found'
         ]);
 
-        // Add table
         doc.autoTable({
             startY: 50,
             head: [['ISBN', 'Description', 'Quantity', 'Status']],
@@ -193,7 +190,6 @@ function downloadPdf() {
             }
         });
 
-        // Save PDF
         const filename = `pod_order_${orderRef}_${new Date().toISOString().slice(0,10)}.pdf`;
         doc.save(filename);
         showStatus('PDF downloaded successfully!', 'success');
@@ -201,6 +197,15 @@ function downloadPdf() {
         console.error('PDF error:', error);
         showStatus('Error creating PDF', 'danger');
     }
+}
+
+// Update enableButtons function to include pdfBtn
+function enableButtons(enabled) {
+    document.getElementById('clearBtn').disabled = !enabled;
+    document.getElementById('downloadBtn').disabled = !enabled;
+    document.getElementById('deleteSelectedBtn').disabled = !enabled;
+    document.getElementById('pdfBtn').disabled = !enabled;
+    document.getElementById('selectAll').checked = false;
 }
 
 async function downloadTemplate() {
