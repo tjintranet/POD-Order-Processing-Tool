@@ -59,30 +59,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Right Column - Email Card -->
-                            <div class="col-md-6">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-header bg-light">
-                                        <h5 class="card-title mb-0">Email Details</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label for="emailAddress" class="form-label">Email Address</label>
-                                            <input type="email" class="form-control" id="emailAddress" placeholder="Enter email address">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="emailSubject" class="form-label">Email Subject</label>
-                                            <input type="text" class="form-control" id="emailSubject" placeholder="Enter email subject">
-                                        </div>
-                                        <div class="mb-3">
-                                            <button type="button" class="btn btn-primary w-100" onclick="sendEmail()" id="emailBtn" disabled>
-                                                <i class="fas fa-envelope"></i> Send Email
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            
                         <div class="mb-3">
                             <div class="alert alert-info mt-md-4" id="status" style="display: none;"></div>
                         </div>
@@ -302,14 +279,6 @@
             }
         }
 
-        function enableButtons(enabled) {
-            document.getElementById('clearBtn').disabled = !enabled;
-            document.getElementById('downloadBtn').disabled = !enabled;
-            document.getElementById('emailBtn').disabled = !enabled;
-            document.getElementById('deleteSelectedBtn').disabled = !enabled;
-            document.getElementById('selectAll').checked = false;
-        }
-
         function toggleAllCheckboxes() {
             const checkboxes = document.querySelectorAll('.row-checkbox');
             const selectAllCheckbox = document.getElementById('selectAll');
@@ -348,56 +317,6 @@
             } catch (error) {
                 console.error('Error downloading template:', error);
                 showStatus('Error downloading template', 'danger');
-            }
-        }
-
-        function sendEmail() {
-            const email = document.getElementById('emailAddress').value.trim();
-            const subject = document.getElementById('emailSubject').value.trim();
-            
-            console.log('Attempting to send email...');
-            console.log('Email:', email);
-            console.log('Subject:', subject);
-
-            if (!email) {
-                showStatus('Please enter an email address', 'warning');
-                return;
-            }
-
-            if (!subject) {
-                showStatus('Please enter an email subject', 'warning');
-                return;
-            }
-
-            try {
-                // Create email content with formatting
-                const orderRef = document.getElementById('orderRef').value.trim();
-                const content = `Order Reference: ${orderRef}\n\n` + 
-                    processedOrders.map(order => 
-                        `ISBN: ${order.isbn}\nDescription: ${order.description}\nQuantity: ${order.quantity}\nStatus: ${order.available ? 'Available' : 'Not Found'}`
-                    ).join('\n\n');
-
-                console.log('Email content created:', content);
-
-                // Create URL-encoded mailto link
-                const mailtoUri = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(content)}`;
-                
-                // For MacOS, try using window.location first
-                window.location.href = mailtoUri;
-                
-                // Fallback method if window.location doesn't work
-                setTimeout(() => {
-                    // If the first method didn't work, try creating a link
-                    const link = document.createElement('a');
-                    link.href = mailtoUri;
-                    link.click();
-                }, 100);
-
-                showStatus('Attempting to open email client...', 'success');
-                console.log('Email process completed');
-            } catch (error) {
-                console.error('Error in email process:', error);
-                showStatus('Error preparing email. Please try again.', 'danger');
             }
         }
 
