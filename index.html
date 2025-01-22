@@ -35,12 +35,25 @@
                     </div>
                     <div class="card-body">
                         <div class="row mb-4">
+                            <!-- Left Column - Order Processing -->
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="orderRef" class="form-label">Order Reference</label>
                                     <input type="text" class="form-control" id="orderRef" placeholder="Enter order reference">
                                     <div class="order-ref-warning" id="orderRefWarning">Please enter an order reference</div>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="excelFile" class="form-label">Upload Excel File</label>
+                                    <input type="file" class="form-control" id="excelFile" accept=".xlsx,.xls">
+                                </div>
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-secondary w-100" onclick="downloadTemplate()">
+                                        <i class="fas fa-download"></i> Download Template
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Right Column - Email -->
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="emailAddress" class="form-label">Email Address</label>
                                     <input type="email" class="form-control" id="emailAddress" placeholder="Enter email address">
@@ -50,25 +63,14 @@
                                     <input type="text" class="form-control" id="emailSubject" placeholder="Enter email subject">
                                 </div>
                                 <div class="mb-3">
-                                    <div class="d-grid gap-2">
-                                        <button type="button" class="btn btn-primary" onclick="sendEmail()" id="emailBtn" disabled>
-                                            <i class="fas fa-envelope"></i> Send Email
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="excelFile" class="form-label">Upload Excel File (ISBN and Quantity columns)</label>
-                                    <input type="file" class="form-control" id="excelFile" accept=".xlsx,.xls">
-                                </div>
-                                <div class="mb-3">
-                                    <button type="button" class="btn btn-secondary" onclick="downloadTemplate()">
-                                        <i class="fas fa-download"></i> Download Template
+                                    <button type="button" class="btn btn-primary w-100" onclick="sendEmail()" id="emailBtn" disabled>
+                                        <i class="fas fa-envelope"></i> Send Email
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="alert alert-info mt-md-4" id="status" style="display: none;"></div>
-                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="alert alert-info mt-md-4" id="status" style="display: none;"></div>
                         </div>
 
                         <!-- Preview Table -->
@@ -336,8 +338,12 @@
         }
 
         function sendEmail() {
-            const email = document.getElementById('emailAddress').value;
-            const subject = document.getElementById('emailSubject').value;
+            const email = document.getElementById('emailAddress').value.trim();
+            const subject = document.getElementById('emailSubject').value.trim();
+            
+            console.log('Attempting to send email...');
+            console.log('Email:', email);
+            console.log('Subject:', subject);
 
             if (!email) {
                 showStatus('Please enter an email address', 'warning');
@@ -349,14 +355,33 @@
                 return;
             }
 
-            // Create email content
-            const content = processedOrders.map(order => 
-                `ISBN: ${order.isbn}\nDescription: ${order.description}\nQuantity: ${order.quantity}\nStatus: ${order.available ? 'Available' : 'Not Found'}`
-            ).join('\n\n');
+            try {
+                // Create email content with formatting
+                const orderRef = document.getElementById('orderRef').value.trim();
+                const content = `Order Reference: ${orderRef}\n\n` + 
+                    processedOrders.map(order => 
+                        `ISBN: ${order.isbn}\nDescription: ${order.description}\nQuantity: ${order.quantity}\nStatus: ${order.available ? 'Available' : 'Not Found'}`
+                    ).join('\n\n');
 
-            // Create mailto link
-            const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(content)}`;
-            window.location.href = mailtoLink;
+                console.log('Email content created:', content);
+
+                // Create and encode mailto link
+                const mailtoLink = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(content)}`;
+                console.log('Mailto link created');
+
+                // Create and click temporary link
+                const tempLink = document.createElement('a');
+                tempLink.href = mailtoLink;
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+                
+                showStatus('Email client opened with order details', 'success');
+                console.log('Email process completed');
+            } catch (error) {
+                console.error('Error in email process:', error);
+                showStatus('Error preparing email. Please try again.', 'danger');
+            }
         }
 
         function showStatus(message, type) {
