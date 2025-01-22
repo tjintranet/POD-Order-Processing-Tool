@@ -207,7 +207,6 @@ function enableButtons(enabled) {
     document.getElementById('pdfBtn').disabled = !enabled;
     document.getElementById('selectAll').checked = false;
 }
-}
 
 async function downloadTemplate() {
     try {
