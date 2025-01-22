@@ -248,8 +248,8 @@
             statusDiv.textContent = message;
             statusDiv.style.display = 'block';
             
-            // Hide status after 3 seconds for success messages
-            if (type === 'success') {
+            // Hide status after 3 seconds for success messages and info messages
+            if (type === 'success' || type === 'info') {
                 setTimeout(() => {
                     statusDiv.style.display = 'none';
                 }, 3000);
