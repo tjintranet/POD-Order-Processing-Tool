@@ -33,6 +33,8 @@ async function handleFileSelect(e) {
         return;
     }
 
+    console.log('Processed Orders:', processedOrders);
+
     orderRefWarning.style.display = 'none';
 
     try {
