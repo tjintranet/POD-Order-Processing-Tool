@@ -201,11 +201,13 @@ function downloadPdf() {
 
 // Update enableButtons function to include pdfBtn
 function enableButtons(enabled) {
+    alert(`Buttons enabled: ${enabled}`);
     document.getElementById('clearBtn').disabled = !enabled;
     document.getElementById('downloadBtn').disabled = !enabled;
     document.getElementById('deleteSelectedBtn').disabled = !enabled;
     document.getElementById('pdfBtn').disabled = !enabled;
     document.getElementById('selectAll').checked = false;
+}
 }
 
 async function downloadTemplate() {
