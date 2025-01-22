@@ -151,63 +151,6 @@ function downloadCsv() {
     }
 }
 
-function downloadPdf() {
-    if (processedOrders.length === 0) {
-        showStatus('No data to download', 'warning');
-        return;
-    }
-
-    try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const orderRef = document.getElementById('orderRef').value;
-
-        doc.setFontSize(16);
-        doc.text('POD Order Details', 14, 20);
-        doc.setFontSize(12);
-        doc.text(`Order Reference: ${orderRef}`, 14, 30);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 40);
-
-        const tableData = processedOrders.map(order => [
-            order.isbn,
-            order.description,
-            order.quantity.toString(),
-            order.available ? 'Available' : 'Not Found'
-        ]);
-
-        doc.autoTable({
-            startY: 50,
-            head: [['ISBN', 'Description', 'Quantity', 'Status']],
-            body: tableData,
-            theme: 'striped',
-            headStyles: { fillColor: [41, 128, 185] },
-            styles: { fontSize: 10 },
-            columnStyles: {
-                0: { cellWidth: 40 },
-                1: { cellWidth: 'auto' },
-                2: { cellWidth: 30 },
-                3: { cellWidth: 30 }
-            }
-        });
-
-        const filename = `pod_order_${orderRef}_${new Date().toISOString().slice(0,10)}.pdf`;
-        doc.save(filename);
-        showStatus('PDF downloaded successfully!', 'success');
-    } catch (error) {
-        console.error('PDF error:', error);
-        showStatus('Error creating PDF', 'danger');
-    }
-}
-
-// Update enableButtons function to include pdfBtn
-function enableButtons(enabled) {
-    document.getElementById('clearBtn').disabled = !enabled;
-    document.getElementById('downloadBtn').disabled = !enabled;
-    document.getElementById('deleteSelectedBtn').disabled = !enabled;
-    document.getElementById('pdfBtn').disabled = !enabled;
-    document.getElementById('selectAll').checked = false;
-}
-
 async function downloadTemplate() {
     try {
         const response = await fetch('order_template.xlsx');
