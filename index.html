@@ -35,6 +35,7 @@
                                 <div class="mb-3">
                                     <label for="orderRef" class="form-label">Order Reference</label>
                                     <input type="text" class="form-control" id="orderRef" placeholder="Enter order reference">
+                                    <div class="order-ref-warning" id="orderRefWarning">Please enter an order reference</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="excelFile" class="form-label">Upload Excel File (ISBN and Quantity columns)</label>
@@ -97,6 +98,19 @@
         async function handleFileSelect(e) {
             const file = e.target.files[0];
             if (!file) return;
+
+            // Check for order reference
+            const orderRef = document.getElementById('orderRef').value.trim();
+            const orderRefWarning = document.getElementById('orderRefWarning');
+            
+            if (!orderRef) {
+                orderRefWarning.style.display = 'block';
+                showStatus('Please enter an order reference before uploading a file', 'warning');
+                document.getElementById('excelFile').value = ''; // Clear the file input
+                return;
+            }
+            
+            orderRefWarning.style.display = 'none';
 
             try {
                 showStatus('Processing file...', 'info');
