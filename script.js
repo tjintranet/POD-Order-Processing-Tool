@@ -47,31 +47,19 @@ async function handleFileSelect(e) {
     try {
         showStatus('Processing file...', 'info');
         const arrayBuffer = await file.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer, {
-            type: 'array',
-            cellText: false,
-            cellDates: true
-        });
+        const workbook = XLSX.read(arrayBuffer);
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const excelData = XLSX.utils.sheet_to_json(worksheet, {
-            header: 1,
-            blankrows: false,
-            raw: false
-        });
-
-        if (excelData.length > 0 && typeof excelData[0][0] === 'string') {
-            excelData.shift();
-        }
+        const excelData = XLSX.utils.sheet_to_json(worksheet);
 
         const booksMap = new Map(booksData.map(item => [item.code, item]));
 
         processedOrders = excelData.map((row, index) => {
-            let isbn = String(row[0] || '');
+            let isbn = String(row.ISBN || '');
             if (isbn.includes('e')) {
                 isbn = Number(isbn).toFixed(0);
             }
             isbn = isbn.replace(/\D/g, '').padStart(13, '0');
-            const quantity = parseInt(row[1]) || 0;
+            const quantity = parseInt(row.Quantity) || 0;
             const stockItem = booksMap.get(isbn);
             
             return {
