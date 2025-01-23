@@ -149,8 +149,10 @@ function downloadCsv() {
     }
 
     const customerType = document.getElementById('customerType').value;
-    if (!customerType || !customerConfig[customerType]) {
-        showStatus('Please select a valid customer type', 'warning');
+    if (!customerType) {
+        const customerSelect = document.getElementById('customerType');
+        customerSelect.classList.add('is-invalid');
+        showStatus('Please select a customer type before downloading', 'warning');
         return;
     }
 
