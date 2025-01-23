@@ -196,8 +196,17 @@ function downloadCsv() {
             }
         });
 
-        // Create CSV with header row
+        // Create CSV with header row and detail rows
         const csvContent = [csvRow];
+        
+        // Add DTL rows for each order
+        processedOrders.forEach(order => {
+            const dtlRow = Array(customer.csvStructure.length).fill('');  // Create empty row matching header length
+            dtlRow[0] = 'DTL';  // Set first column to DTL
+            dtlRow[3] = order.isbn;  // ISBN in 4th column
+            dtlRow[4] = order.quantity.toString();  // Quantity in 5th column
+            csvContent.push(dtlRow);
+        });
 
         // Create and download file
         const csv = Papa.unparse(csvContent);
