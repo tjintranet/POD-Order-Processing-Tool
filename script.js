@@ -1,6 +1,7 @@
 // Global variables
 let booksData = [];
 let processedOrders = [];
+let customerConfig = {};
 
 // Fetch ISBN data when page loads
 async function fetchData() {
@@ -13,6 +14,16 @@ async function fetchData() {
     } catch (error) {
         console.error('Error fetching data:', error);
         showStatus('Error loading book data: ' + error.message, 'danger');
+    }
+}
+
+async function loadCustomerConfig() {
+    try {
+        const response = await fetch('customer-config.json');
+        customerConfig = await response.json();
+    } catch (error) {
+        console.error('Error loading customer config:', error);
+        showStatus('Error loading customer configuration', 'danger');
     }
 }
 
@@ -66,7 +77,7 @@ async function handleFileSelect(e) {
             const stockItem = booksMap.get(isbn);
             
             return {
-                lineNumber: String(index + 1).padStart(3, '0'),  // Sequential line number
+                lineNumber: String(index + 1).padStart(3, '0'),
                 orderRef,
                 isbn,
                 description: stockItem?.description || 'Not Found',
@@ -120,6 +131,11 @@ function updatePreviewTable() {
     });
 }
 
+function formatDate() {
+    const now = new Date();
+    return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+}
+
 function deleteRow(index) {
     processedOrders.splice(index, 1);
     // Update line numbers after deletion
@@ -147,8 +163,44 @@ function downloadCsv() {
         return;
     }
 
+    const customerType = document.getElementById('customerType').value;
+    if (!customerType || !customerConfig[customerType]) {
+        showStatus('Please select a valid customer type', 'warning');
+        return;
+    }
+
     try {
-        const csv = Papa.unparse(processedOrders);
+        const customer = customerConfig[customerType];
+        const formattedDate = formatDate();
+        const orderRef = document.getElementById('orderRef').value;
+
+        // Create CSV row based on customer configuration
+        const csvRow = customer.csvStructure.map(field => {
+            switch(field) {
+                case 'HDR':
+                    return 'HDR';
+                case 'orderNumber':
+                    return orderRef;
+                case 'date':
+                    return formattedDate;
+                case 'code':
+                    return customer.headerCode || '';
+                case 'type':
+                    return customer.type || '';
+                case 'companyName':
+                    return customer.name;
+                case 'phone':
+                    return customer.phone;
+                default:
+                    return customer.address[field] || '';
+            }
+        });
+
+        // Create CSV with header row
+        const csvContent = [csvRow];
+
+        // Create and download file
+        const csv = Papa.unparse(csvContent);
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -243,3 +295,4 @@ function showStatus(message, type) {
 
 // Initialize by fetching data
 fetchData();
+loadCustomerConfig();
