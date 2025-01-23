@@ -63,7 +63,7 @@ async function handleFileSelect(e) {
         const booksMap = new Map(booksData.map(item => [item.code, item]));
 
         // Process each row
-        processedOrders = excelData.map((row) => {
+        processedOrders = excelData.map((row, index) => {
             let isbn = String(row[0] || '');
             if (isbn.includes('e')) {
                 isbn = Number(isbn).toFixed(0);
@@ -75,6 +75,7 @@ async function handleFileSelect(e) {
             
             return {
                 orderRef,
+                sequentialNumber: String(index + 1).padStart(3, '0'),
                 isbn,
                 description: stockItem?.description || 'Not Found',
                 quantity,
@@ -115,7 +116,7 @@ function updatePreviewTable() {
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
-            <td>${sequentialNumber}</td>
+            <td>${order.sequentialNumber}</td>
             <td>${order.isbn}</td>
             <td>${order.description}</td>
             <td>${order.quantity}</td>
@@ -154,7 +155,7 @@ function downloadCsv() {
     try {
         // Create export data with sequential numbers
         const exportData = processedOrders.map((order, index) => {
-            const sequentialNumber = String(index + 1).padStart(3, '0');
+
             return {
                 sequentialNumber,
                 ...order
