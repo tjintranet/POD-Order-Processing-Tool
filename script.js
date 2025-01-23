@@ -3,7 +3,6 @@ let booksData = [];
 let processedOrders = [];
 let customerConfig = {};
 
-// Fetch ISBN data when page loads
 async function fetchData() {
     try {
         const response = await fetch('data.json');
@@ -66,7 +65,6 @@ async function handleFileSelect(e) {
 
         const booksMap = new Map(booksData.map(item => [item.code, item]));
 
-        // Process each row with line numbers
         processedOrders = excelData.map((row, index) => {
             let isbn = String(row[0] || '');
             if (isbn.includes('e')) {
@@ -138,7 +136,6 @@ function formatDate() {
 
 function deleteRow(index) {
     processedOrders.splice(index, 1);
-    // Update line numbers after deletion
     processedOrders = processedOrders.map((order, idx) => ({
         ...order,
         lineNumber: String(idx + 1).padStart(3, '0')
@@ -174,7 +171,6 @@ function downloadCsv() {
         const formattedDate = formatDate();
         const orderRef = document.getElementById('orderRef').value;
 
-        // Create CSV row based on customer configuration
         const csvRow = customer.csvStructure.map(field => {
             switch(field) {
                 case 'HDR':
@@ -196,19 +192,16 @@ function downloadCsv() {
             }
         });
 
-        // Create CSV with header row and detail rows
         const csvContent = [csvRow];
         
-        // Add DTL rows for each order
         processedOrders.forEach(order => {
             const dtlRow = Array(customer.csvStructure.length).fill('');
-            dtlRow[0] = 'DTL';
-            dtlRow[customer.dtlStructure.isbnColumn] = order.isbn;
-            dtlRow[customer.dtlStructure.quantityColumn] = order.quantity.toString();
+            dtlRow[0] = customer.dtlStructure.marker;
+            dtlRow[customer.dtlStructure.columns.isbn] = order.isbn;
+            dtlRow[customer.dtlStructure.columns.quantity] = order.quantity.toString();
             csvContent.push(dtlRow);
         });
 
-        // Create and download file
         const csv = Papa.unparse(csvContent);
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
@@ -278,7 +271,6 @@ function deleteSelected() {
         processedOrders.splice(index, 1);
     });
 
-    // Update line numbers after bulk deletion
     processedOrders = processedOrders.map((order, idx) => ({
         ...order,
         lineNumber: String(idx + 1).padStart(3, '0')
@@ -302,6 +294,5 @@ function showStatus(message, type) {
     }
 }
 
-// Initialize by fetching data
 fetchData();
 loadCustomerConfig();
