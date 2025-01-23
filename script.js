@@ -55,8 +55,7 @@ async function handleFileSelect(e) {
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const excelData = XLSX.utils.sheet_to_json(worksheet, {
             header: 1,
-            raw: false,
-            defval: ''
+            raw: true
         });
 
         if (excelData.length > 0 && typeof excelData[0][0] === 'string') {
