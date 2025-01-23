@@ -12,7 +12,14 @@
         },
         "phone": "01162364325",
         "headerCode": "194",
-        "csvStructure": ["HDR", "orderNumber", "date", "code", "companyName", "street", "road", "city", "region", "country", "postcode", "countryCode", "phone"]
+        "csvStructure": ["HDR", "orderNumber", "date", "code", "companyName", "street", "road", "city", "region", "country", "postcode", "countryCode", "phone"],
+        "dtlStructure": {
+            "marker": "DTL",
+            "columns": {
+                "isbn": 4,
+                "quantity": 5
+            }
+        }
     },
     "house": {
         "name": "TJ Books",
@@ -26,6 +33,13 @@
         },
         "phone": "01841534201",
         "type": "Replacement",
-        "csvStructure": ["HDR", "orderNumber", "date", "type", "companyName", "street", "", "city", "region", "country", "postcode", "countryCode", "phone"]
+        "csvStructure": ["HDR", "orderNumber", "date", "type", "companyName", "street", "", "city", "region", "country", "postcode", "countryCode", "phone"],
+        "dtlStructure": {
+            "marker": "DTL",
+            "columns": {
+                "isbn": 4,
+                "quantity": 5
+            }
+        }
     }
 }
