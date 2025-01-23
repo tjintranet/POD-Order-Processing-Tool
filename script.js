@@ -201,10 +201,10 @@ function downloadCsv() {
         
         // Add DTL rows for each order
         processedOrders.forEach(order => {
-            const dtlRow = Array(customer.csvStructure.length).fill('');  // Create empty row matching header length
-            dtlRow[0] = 'DTL';  // Set first column to DTL
-            dtlRow[3] = order.isbn;  // ISBN in 4th column
-            dtlRow[4] = order.quantity.toString();  // Quantity in 5th column
+            const dtlRow = Array(customer.csvStructure.length).fill('');
+            dtlRow[0] = 'DTL';
+            dtlRow[customer.dtlStructure.isbnColumn] = order.isbn;
+            dtlRow[customer.dtlStructure.quantityColumn] = order.quantity.toString();
             csvContent.push(dtlRow);
         });
 
