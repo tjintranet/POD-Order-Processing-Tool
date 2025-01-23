@@ -2,7 +2,6 @@
 let booksData = [];
 let processedOrders = [];
 
-// Fetch ISBN data when page loads
 async function fetchData() {
     try {
         const response = await fetch('data.json');
@@ -16,7 +15,6 @@ async function fetchData() {
     }
 }
 
-// Handle file input change
 document.getElementById('excelFile').addEventListener('change', handleFileSelect);
 
 async function handleFileSelect(e) {
@@ -38,10 +36,16 @@ async function handleFileSelect(e) {
     try {
         showStatus('Processing file...', 'info');
         const arrayBuffer = await file.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const workbook = XLSX.read(arrayBuffer, { 
+            type: 'array',
+            cellText: false,
+            cellDates: true
+        });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        
         const excelData = XLSX.utils.sheet_to_json(worksheet, {
             header: 1,
+            raw: false,
             defval: ''
         });
 
@@ -51,13 +55,19 @@ async function handleFileSelect(e) {
 
         const booksMap = new Map(booksData.map(item => [item.code, item]));
 
-        processedOrders = excelData.map(row => {
-            let isbn = String(row[0] || '').replace(/\D/g, '').padStart(13, '0');
+        processedOrders = excelData.map((row, index) => {
+            let isbn = String(row[0] || '');
+            if (isbn.includes('e')) {
+                isbn = Number(isbn).toFixed(0);
+            }
+            isbn = isbn.replace(/\D/g, '').padStart(13, '0');
             const quantity = parseInt(row[1]) || 0;
+            
             const stockItem = booksMap.get(isbn);
-
+            
             return {
                 orderRef,
+                sequentialNumber: String(index + 1).padStart(3, '0'),
                 isbn,
                 description: stockItem?.description || 'Not Found',
                 quantity,
@@ -87,6 +97,8 @@ function updatePreviewTable() {
 
     processedOrders.forEach((order, index) => {
         const tr = document.createElement('tr');
+        const sequentialNumber = String(index + 1).padStart(3, '0');
+        
         tr.innerHTML = `
             <td>
                 <input type="checkbox" class="row-checkbox" data-index="${index}">
@@ -96,7 +108,7 @@ function updatePreviewTable() {
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
-            <td>${order.orderRef}</td>
+            <td>${sequentialNumber}</td>
             <td>${order.isbn}</td>
             <td>${order.description}</td>
             <td>${order.quantity}</td>
@@ -133,12 +145,24 @@ function downloadCsv() {
     }
 
     try {
-        const csv = Papa.unparse(processedOrders);
+        const exportData = processedOrders.map((order, index) => ({
+            ...order,
+            sequentialNumber: String(index + 1).padStart(3, '0')
+        }));
+
+        const csv = Papa.unparse(exportData);
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `pod_order_${new Date().toISOString().replace(/[:.]/g, '-')}.csv`;
+        const now = new Date();
+        const filename = `pod_order_${now.getFullYear()}_${
+            String(now.getMonth() + 1).padStart(2, '0')}_${
+            String(now.getDate()).padStart(2, '0')}_${
+            String(now.getHours()).padStart(2, '0')}_${
+            String(now.getMinutes()).padStart(2, '0')}_${
+            String(now.getSeconds()).padStart(2, '0')}.csv`;
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
