@@ -243,7 +243,50 @@ function enableButtons(enabled) {
     document.getElementById('clearBtn').disabled = !enabled;
     document.getElementById('downloadBtn').disabled = !enabled;
     document.getElementById('deleteSelectedBtn').disabled = !enabled;
+    document.getElementById('copyBtn').disabled = !enabled;
     document.getElementById('selectAll').checked = false;
+}
+
+function copyTableToClipboard() {
+    if (processedOrders.length === 0) return;
+
+    let tableHtml = `
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+            <thead>
+                <tr style="background-color: #f8f9fa;">
+                    <th style="padding: 8px; border: 1px solid #dee2e6;">Line No</th>
+                    <th style="padding: 8px; border: 1px solid #dee2e6;">ISBN</th>
+                    <th style="padding: 8px; border: 1px solid #dee2e6;">Description</th>
+                    <th style="padding: 8px; border: 1px solid #dee2e6;">Quantity</th>
+                    <th style="padding: 8px; border: 1px solid #dee2e6;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    processedOrders.forEach(order => {
+        tableHtml += `
+            <tr>
+                <td style="padding: 8px; border: 1px solid #dee2e6;">${order.lineNumber}</td>
+                <td style="padding: 8px; border: 1px solid #dee2e6;">${order.isbn}</td>
+                <td style="padding: 8px; border: 1px solid #dee2e6;">${order.description}</td>
+                <td style="padding: 8px; border: 1px solid #dee2e6;">${order.quantity}</td>
+                <td style="padding: 8px; border: 1px solid #dee2e6; ${order.available ? 'color: green;' : 'color: red;'}">${order.available ? 'Available' : 'Not Found'}</td>
+            </tr>
+        `;
+    });
+
+    tableHtml += '</tbody></table>';
+
+    const blob = new Blob([tableHtml], { type: 'text/html' });
+    const clipboardItem = new ClipboardItem({ 'text/html': blob });
+    
+    navigator.clipboard.write([clipboardItem]).then(() => {
+        showStatus('Table copied to clipboard', 'success');
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        showStatus('Failed to copy table', 'danger');
+    });
 }
 
 function toggleAllCheckboxes() {
@@ -285,6 +328,7 @@ function showStatus(message, type) {
             statusDiv.style.display = 'none';
         }, 3000);
     }
+    
 }
 
 fetchData();

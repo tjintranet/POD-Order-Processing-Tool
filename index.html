@@ -73,10 +73,14 @@
                         </div>
 
                         <!-- Preview Table -->
-                        <div class="mb-3">
-                            <button class="btn btn-danger" onclick="deleteSelected()" id="deleteSelectedBtn" disabled>
-                                <i class="fas fa-trash"></i> Delete Selected Rows
-                            </button>
+<!-- Add this button next to the Delete Selected button -->
+                        <div class="mb-3 d-flex gap-2">
+                        <button class="btn btn-danger" onclick="deleteSelected()" id="deleteSelectedBtn" disabled>
+                        <i class="fas fa-trash"></i> Delete Selected Rows
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyTableToClipboard()" id="copyBtn" disabled>
+                        <i class="fas fa-copy"></i> Copy to Clipboard
+                        </button>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover" id="previewTable">
