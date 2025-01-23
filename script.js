@@ -2,6 +2,7 @@
 let booksData = [];
 let processedOrders = [];
 
+// Fetch ISBN data when page loads
 async function fetchData() {
     try {
         const response = await fetch('data.json');
@@ -15,26 +16,30 @@ async function fetchData() {
     }
 }
 
+// Enable file input handling
 document.getElementById('excelFile').addEventListener('change', handleFileSelect);
 
 async function handleFileSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
 
+    // Check for order reference
     const orderRef = document.getElementById('orderRef').value.trim();
     const orderRefWarning = document.getElementById('orderRefWarning');
-
+    
     if (!orderRef) {
         orderRefWarning.style.display = 'block';
         showStatus('Please enter an order reference before uploading a file', 'warning');
         document.getElementById('excelFile').value = '';
         return;
     }
-
+    
     orderRefWarning.style.display = 'none';
 
     try {
         showStatus('Processing file...', 'info');
+        
+        // Read Excel file
         const arrayBuffer = await file.arrayBuffer();
         const workbook = XLSX.read(arrayBuffer, { 
             type: 'array',
@@ -49,13 +54,16 @@ async function handleFileSelect(e) {
             defval: ''
         });
 
+        // Remove header row if present
         if (excelData.length > 0 && typeof excelData[0][0] === 'string') {
             excelData.shift();
         }
 
+        // Create a Map for faster lookups
         const booksMap = new Map(booksData.map(item => [item.code, item]));
 
-        processedOrders = excelData.map((row, index) => {
+        // Process each row
+        processedOrders = excelData.map((row) => {
             let isbn = String(row[0] || '');
             if (isbn.includes('e')) {
                 isbn = Number(isbn).toFixed(0);
@@ -67,7 +75,6 @@ async function handleFileSelect(e) {
             
             return {
                 orderRef,
-                sequentialNumber: String(index + 1).padStart(3, '0'),
                 isbn,
                 description: stockItem?.description || 'Not Found',
                 quantity,
@@ -145,10 +152,14 @@ function downloadCsv() {
     }
 
     try {
-        const exportData = processedOrders.map((order, index) => ({
-            ...order,
-            sequentialNumber: String(index + 1).padStart(3, '0')
-        }));
+        // Create export data with sequential numbers
+        const exportData = processedOrders.map((order, index) => {
+            const sequentialNumber = String(index + 1).padStart(3, '0');
+            return {
+                sequentialNumber,
+                ...order
+            };
+        });
 
         const csv = Papa.unparse(exportData);
         const blob = new Blob([csv], { type: 'text/csv' });
@@ -178,9 +189,6 @@ function downloadCsv() {
 async function downloadTemplate() {
     try {
         const response = await fetch('order_template.xlsx');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -190,7 +198,7 @@ async function downloadTemplate() {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-
+        
         showStatus('Template downloaded successfully!', 'success');
     } catch (error) {
         console.error('Error downloading template:', error);
@@ -233,7 +241,7 @@ function showStatus(message, type) {
     statusDiv.className = `alert alert-${type}`;
     statusDiv.textContent = message;
     statusDiv.style.display = 'block';
-
+    
     if (type === 'success' || type === 'info') {
         setTimeout(() => {
             statusDiv.style.display = 'none';
