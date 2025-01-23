@@ -60,7 +60,7 @@ async function handleFileSelect(e) {
                 isbn = Number(isbn).toFixed(0);
             }
             isbn = isbn.replace(/\D/g, '').padStart(13, '0');
-            const quantity = parseInt(row.QTY) || 0;
+            const quantity = parseInt(row.Qty) || 0;
             console.log('Processed quantity:', quantity);
             const stockItem = booksMap.get(isbn);
             
