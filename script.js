@@ -54,12 +54,14 @@ async function handleFileSelect(e) {
         const booksMap = new Map(booksData.map(item => [item.code, item]));
 
         processedOrders = excelData.map((row, index) => {
+            console.log('Raw Excel Row:', row);
             let isbn = String(row.ISBN || '');
             if (isbn.includes('e')) {
                 isbn = Number(isbn).toFixed(0);
             }
             isbn = isbn.replace(/\D/g, '').padStart(13, '0');
-            const quantity = parseInt(row.Quantity || row.QTY || 0);
+            const quantity = parseInt(row.QTY) || 0;
+            console.log('Processed quantity:', quantity);
             const stockItem = booksMap.get(isbn);
             
             return {
