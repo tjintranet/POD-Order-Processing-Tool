@@ -16,14 +16,12 @@ async function fetchData() {
     }
 }
 
-// Enable file input handling
 document.getElementById('excelFile').addEventListener('change', handleFileSelect);
 
 async function handleFileSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Check for order reference
     const orderRef = document.getElementById('orderRef').value.trim();
     const orderRefWarning = document.getElementById('orderRefWarning');
     
@@ -38,31 +36,26 @@ async function handleFileSelect(e) {
 
     try {
         showStatus('Processing file...', 'info');
-        
-        // Read Excel file
         const arrayBuffer = await file.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer, { 
+        const workbook = XLSX.read(arrayBuffer, {
             type: 'array',
             cellText: false,
             cellDates: true
         });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        
         const excelData = XLSX.utils.sheet_to_json(worksheet, {
             header: 1,
             raw: false,
             defval: ''
         });
 
-        // Remove header row if present
         if (excelData.length > 0 && typeof excelData[0][0] === 'string') {
             excelData.shift();
         }
 
-        // Create a Map for faster lookups
         const booksMap = new Map(booksData.map(item => [item.code, item]));
 
-        // Process each row
+        // Process each row with line numbers
         processedOrders = excelData.map((row, index) => {
             let isbn = String(row[0] || '');
             if (isbn.includes('e')) {
@@ -70,12 +63,11 @@ async function handleFileSelect(e) {
             }
             isbn = isbn.replace(/\D/g, '').padStart(13, '0');
             const quantity = parseInt(row[1]) || 0;
-            
             const stockItem = booksMap.get(isbn);
             
             return {
+                lineNumber: String(index + 1).padStart(3, '0'),  // Sequential line number
                 orderRef,
-                sequentialNumber: String(index + 1).padStart(3, '0'),
                 isbn,
                 description: stockItem?.description || 'Not Found',
                 quantity,
@@ -105,8 +97,6 @@ function updatePreviewTable() {
 
     processedOrders.forEach((order, index) => {
         const tr = document.createElement('tr');
-        const sequentialNumber = String(index + 1).padStart(3, '0');
-        
         tr.innerHTML = `
             <td>
                 <input type="checkbox" class="row-checkbox" data-index="${index}">
@@ -116,7 +106,7 @@ function updatePreviewTable() {
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
-            <td>${order.sequentialNumber}</td>
+            <td>${order.lineNumber}</td>
             <td>${order.isbn}</td>
             <td>${order.description}</td>
             <td>${order.quantity}</td>
@@ -132,6 +122,11 @@ function updatePreviewTable() {
 
 function deleteRow(index) {
     processedOrders.splice(index, 1);
+    // Update line numbers after deletion
+    processedOrders = processedOrders.map((order, idx) => ({
+        ...order,
+        lineNumber: String(idx + 1).padStart(3, '0')
+    }));
     updatePreviewTable();
     showStatus(`Row ${index + 1} deleted`, 'info');
     enableButtons(processedOrders.length > 0);
@@ -153,16 +148,7 @@ function downloadCsv() {
     }
 
     try {
-        // Create export data with sequential numbers
-        const exportData = processedOrders.map((order, index) => {
-
-            return {
-                sequentialNumber,
-                ...order
-            };
-        });
-
-        const csv = Papa.unparse(exportData);
+        const csv = Papa.unparse(processedOrders);
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -199,7 +185,6 @@ async function downloadTemplate() {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
         showStatus('Template downloaded successfully!', 'success');
     } catch (error) {
         console.error('Error downloading template:', error);
@@ -231,6 +216,12 @@ function deleteSelected() {
     indices.forEach(index => {
         processedOrders.splice(index, 1);
     });
+
+    // Update line numbers after bulk deletion
+    processedOrders = processedOrders.map((order, idx) => ({
+        ...order,
+        lineNumber: String(idx + 1).padStart(3, '0')
+    }));
 
     updatePreviewTable();
     showStatus(`${indices.length} rows deleted`, 'info');
