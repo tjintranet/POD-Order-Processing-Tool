@@ -162,9 +162,9 @@ function downloadCsv() {
         const customer = customerConfig[customerType];
         const formattedDate = formatDate();
         const orderRef = document.getElementById('orderRef').value;
-
+    
         const csvRow = customer.csvStructure.map(field => {
-            switch(field) {
+            switch (field) {
                 case 'HDR':
                     return 'HDR';
                 case 'orderNumber':
@@ -183,9 +183,12 @@ function downloadCsv() {
                     return customer.address[field] || '';
             }
         });
-
-        const csvContent = [csvRow];
-        
+    
+        // Safely append an extra blank column for CSV without affecting other functions
+        const finalCsvRow = [...csvRow, ''];
+    
+        const csvContent = [finalCsvRow];
+    
         processedOrders.forEach(order => {
             const dtlRow = Array(customer.csvStructure.length).fill('');
             dtlRow[0] = 'DTL';
@@ -194,7 +197,7 @@ function downloadCsv() {
             dtlRow[4] = order.quantity.toString();
             csvContent.push(dtlRow);
         });
-
+    
         const csv = Papa.unparse(csvContent);
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
@@ -212,32 +215,13 @@ function downloadCsv() {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-
+    
         showStatus('CSV downloaded successfully!', 'success');
     } catch (error) {
         console.error('Download error:', error);
         showStatus('Error creating CSV file', 'danger');
     }
-}
-
-async function downloadTemplate() {
-    try {
-        const response = await fetch('order_template.xlsx');
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'order_template.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        showStatus('Template downloaded successfully!', 'success');
-    } catch (error) {
-        console.error('Error downloading template:', error);
-        showStatus('Error downloading template', 'danger');
-    }
-}
+}    
 
 function enableButtons(enabled) {
     document.getElementById('clearBtn').disabled = !enabled;
