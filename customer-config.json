@@ -1,6 +1,6 @@
 {
     "ulverscroft": {
-        "name": "Ulverscroft Large Print Books Ltd",
+        "name": "Ulverscroft Books Ltd",
         "address": {
             "street": "The Green",
             "road": "Bradgate Road",
@@ -41,5 +41,26 @@
                 "quantity": 5
             }
         }
-    }
+    },
+    "t&f": {
+        "name": "Taylor & Francis UK",
+        "address": {
+            "street": " ",
+            "city": " ",
+            "region": " ",
+            "country": "UK",
+            "postcode": " ",
+            "countryCode": "GB"
+        },
+        "phone": " ",
+        "type": "Short Run",
+        "csvStructure": ["HDR", "orderNumber", "date", "type", "companyName", "street", "", "city", "region", "country", "postcode", "countryCode", "phone"],
+        "dtlStructure": {
+            "marker": "DTL",
+            "columns": {
+                "isbn": 4,
+                "quantity": 5
+            }
+        }
+    }    
 }

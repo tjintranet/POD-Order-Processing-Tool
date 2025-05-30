@@ -144,6 +144,46 @@ function clearAll() {
     enableButtons(false);
 }
 
+function downloadTemplate() {
+    try {
+        // Create a simple workbook with the required columns
+        const wb = XLSX.utils.book_new();
+        
+        // Create sample data with the required columns
+        const templateData = [
+            { ISBN: '9781234567890', Qty: 1 },
+            { ISBN: '9780987654321', Qty: 2 },
+            { ISBN: '9781111111111', Qty: 1 }
+        ];
+        
+        // Convert to worksheet
+        const ws = XLSX.utils.json_to_sheet(templateData);
+        
+        // Set column widths for better readability
+        ws['!cols'] = [
+            { width: 15 }, // ISBN column
+            { width: 10 }  // Qty column
+        ];
+        
+        // Add the worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Order Template');
+        
+        // Generate file and trigger download
+        const now = new Date();
+        const filename = `pod_order_template_${now.getFullYear()}_${
+            String(now.getMonth() + 1).padStart(2, '0')}_${
+            String(now.getDate()).padStart(2, '0')}.xlsx`;
+            
+        XLSX.writeFile(wb, filename);
+        
+        showStatus('Template downloaded successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Template download error:', error);
+        showStatus('Error downloading template', 'danger');
+    }
+}
+
 function downloadCsv() {
     if (processedOrders.length === 0) {
         showStatus('No data to download', 'warning');
@@ -221,7 +261,7 @@ function downloadCsv() {
         console.error('Download error:', error);
         showStatus('Error creating CSV file', 'danger');
     }
-}    
+}
 
 function enableButtons(enabled) {
     document.getElementById('clearBtn').disabled = !enabled;
@@ -312,8 +352,8 @@ function showStatus(message, type) {
             statusDiv.style.display = 'none';
         }, 3000);
     }
-    
 }
 
+// Initialize the application
 fetchData();
 loadCustomerConfig();
