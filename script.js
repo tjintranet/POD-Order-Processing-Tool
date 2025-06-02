@@ -152,8 +152,6 @@ function downloadTemplate() {
         // Create sample data with the required columns
         const templateData = [
             { ISBN: '9781234567890', Qty: 1 },
-            { ISBN: '9780987654321', Qty: 2 },
-            { ISBN: '9781111111111', Qty: 1 }
         ];
         
         // Convert to worksheet
