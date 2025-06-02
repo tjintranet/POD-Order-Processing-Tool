@@ -145,41 +145,23 @@ function clearAll() {
 }
 
 function downloadTemplate() {
-    try {
-        // Create a simple workbook with the required columns
-        const wb = XLSX.utils.book_new();
-        
-        // Create sample data with the required columns
-        const templateData = [
-            { ISBN: '9781234567890', Qty: 1 },
-        ];
-        
-        // Convert to worksheet
-        const ws = XLSX.utils.json_to_sheet(templateData);
-        
-        // Set column widths for better readability
-        ws['!cols'] = [
-            { width: 15 }, // ISBN column
-            { width: 10 }  // Qty column
-        ];
-        
-        // Add the worksheet to workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'Order Template');
-        
-        // Generate file and trigger download
-        const now = new Date();
-        const filename = `pod_order_template_${now.getFullYear()}_${
-            String(now.getMonth() + 1).padStart(2, '0')}_${
-            String(now.getDate()).padStart(2, '0')}.xlsx`;
-            
-        XLSX.writeFile(wb, filename);
-        
-        showStatus('Template downloaded successfully!', 'success');
-        
-    } catch (error) {
-        console.error('Template download error:', error);
-        showStatus('Error downloading template', 'danger');
-    }
+    // Create a link element
+    const link = document.createElement('a');
+    
+    // Set the href to the template file path
+    link.href = 'order_template.xlsx';
+    
+    // Set the download attribute to force download with a specific filename
+    link.download = 'order_template.xlsx';
+    
+    // Temporarily add the link to the document
+    document.body.appendChild(link);
+    
+    // Trigger the download
+    link.click();
+    
+    // Remove the link from the document
+    document.body.removeChild(link);
 }
 
 function downloadCsv() {
