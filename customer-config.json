@@ -45,16 +45,17 @@
     "t&f": {
         "name": "Taylor & Francis UK",
         "address": {
-            "street": " ",
-            "city": " ",
-            "region": " ",
+            "street": "4 Park Square",
+            "road": "Milton Park",
+            "city": "Oxford",
+            "region": "Oxfordshire",
             "country": "UK",
-            "postcode": " ",
+            "postcode": "OX1 2JD",
             "countryCode": "GB"
         },
-        "phone": " ",
+        "phone": "",
         "type": "Short Run",
-        "csvStructure": ["HDR", "orderNumber", "date", "type", "companyName", "street", "", "city", "region", "country", "postcode", "countryCode", "phone"],
+        "csvStructure": ["HDR", "orderNumber", "date", "type", "companyName", "street", "road", "city", "region", "country", "postcode", "countryCode", "phone"],
         "dtlStructure": {
             "marker": "DTL",
             "columns": {
