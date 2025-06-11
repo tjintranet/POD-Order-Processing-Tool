@@ -42,6 +42,27 @@
             }
         }
     },
+    "history": {
+        "name": "History Press",
+        "address": {
+            "street": "Macmillan Distribution",
+            "road": "Swansea Warehouse",
+            "city": "Swansea",
+            "region": "West Glamorgan",
+            "country": "UK",
+            "postcode": "SA6 8QR",
+            "countryCode": "GB"
+        },
+        "type": "Manual Order",
+        "csvStructure": ["HDR", "orderNumber", "date", "type", "companyName", "street", "", "city", "region", "country", "postcode", "countryCode", "phone"],
+        "dtlStructure": {
+            "marker": "DTL",
+            "columns": {
+                "isbn": 4,
+                "quantity": 5
+            }
+        }
+    },    
     "t&f": {
         "name": "Taylor & Francis UK",
         "address": {
