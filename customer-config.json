@@ -63,6 +63,28 @@
             }
         }
     },    
+    "stobart": {
+        "name": "Stobart Davies (2002) Ltd",
+        "address": {
+            "street": "Stobart House",
+            "road": "Penybanc Road",
+            "city": "Ammanford",
+            "region": "Carmarthenshire",
+            "country": "Wales",
+            "postcode": "SA18 3HP",
+            "countryCode": "GB"
+        },
+        "phone": "",
+        "type": "Short Run",
+        "csvStructure": ["HDR", "orderNumber", "date", "type", "companyName", "street", "road", "city", "region", "country", "postcode", "countryCode", "phone"],
+        "dtlStructure": {
+            "marker": "DTL",
+            "columns": {
+                "isbn": 4,
+                "quantity": 5
+            }
+        }
+    },
     "t&f": {
         "name": "Taylor & Francis UK",
         "address": {
@@ -84,5 +106,5 @@
                 "quantity": 5
             }
         }
-    }    
+    }
 }
